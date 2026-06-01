@@ -1,5 +1,6 @@
 <template>
-  <main class="min-h-screen bg-slate-100 text-slate-900">
+  <RouterView v-if="$route.path === '/login'" />
+  <main v-else class="min-h-screen bg-slate-100 text-slate-900">
     <aside class="fixed inset-y-0 left-0 hidden w-64 border-r border-slate-200 bg-white p-5 lg:block">
       <div class="mb-8 text-2xl font-bold">RIS V1</div>
       <nav class="space-y-1">

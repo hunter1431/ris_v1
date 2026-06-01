@@ -12,6 +12,8 @@ use App\Http\Requests\StoreRisRequest;
 use App\Http\Resources\RisResource;
 use App\Models\RisHeader;
 use App\Repositories\RisRepository;
+use App\Services\DigitalSignatureService;
+use App\Services\QrVerificationService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
@@ -49,9 +51,15 @@ class RisController extends Controller
         return new RisResource($action->execute($ris, $request->user()->id, $data['details']));
     }
 
-    public function pdf(RisHeader $ris)
+    public function pdf(RisHeader $ris, QrVerificationService $qr, DigitalSignatureService $signatures)
     {
         $ris->load(['division', 'details.item', 'requestedBy', 'approvedBy', 'issuedBy', 'receivedBy']);
-        return Pdf::loadView('pdf.ris', ['ris' => $ris])->download("{$ris->ris_no}.pdf");
+
+        return Pdf::loadView('pdf.ris', [
+            'ris' => $ris,
+            'qrCode' => $qr->svgDataUri($ris),
+            'verificationUrl' => $qr->verificationUrl($ris),
+            'signatures' => $signatures->forRisPdf($ris),
+        ])->download("{$ris->ris_no}.pdf");
     }
 }

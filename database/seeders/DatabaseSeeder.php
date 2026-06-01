@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Category;
+use App\Models\ApprovalMatrixStep;
 use App\Models\Division;
 use App\Models\Item;
 use App\Models\User;
@@ -14,6 +15,16 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call(RolePermissionSeeder::class);
+
+        ApprovalMatrixStep::firstOrCreate(
+            ['module' => 'ris', 'level' => 1],
+            ['role_name' => 'Division Head', 'action_label' => 'Division Head Approval', 'is_final' => false, 'is_active' => true]
+        );
+
+        ApprovalMatrixStep::firstOrCreate(
+            ['module' => 'ris', 'level' => 2],
+            ['role_name' => 'Supply Officer', 'action_label' => 'Supply Office Approval', 'is_final' => true, 'is_active' => true]
+        );
 
         $division = Division::firstOrCreate(['code' => 'ADMIN'], ['name' => 'Administrative Division']);
         $category = Category::firstOrCreate(['name' => 'Office Supplies']);

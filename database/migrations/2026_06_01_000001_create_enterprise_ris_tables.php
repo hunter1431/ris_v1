@@ -49,7 +49,20 @@ return new class extends Migration
             $table->foreignId('received_by')->nullable()->constrained('users')->nullOnDelete();
             $table->enum('status', ['draft', 'pending', 'approved', 'issued', 'completed', 'cancelled'])->default('draft');
             $table->string('qr_token')->unique()->nullable();
+            $table->unsignedSmallInteger('current_approval_level')->default(0);
             $table->timestamps();
+        });
+
+        Schema::create('approval_matrix_steps', function (Blueprint $table) {
+            $table->id();
+            $table->string('module')->default('ris');
+            $table->unsignedSmallInteger('level');
+            $table->string('role_name');
+            $table->string('action_label');
+            $table->boolean('is_final')->default(false);
+            $table->boolean('is_active')->default(true);
+            $table->timestamps();
+            $table->unique(['module', 'level']);
         });
 
         Schema::create('ris_details', function (Blueprint $table) {
@@ -70,6 +83,8 @@ return new class extends Migration
             $table->foreignId('ris_id')->constrained('ris_headers')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained()->restrictOnDelete();
             $table->enum('action', ['submitted', 'approved', 'rejected', 'issued', 'completed', 'cancelled']);
+            $table->unsignedSmallInteger('approval_level')->nullable();
+            $table->string('role_name')->nullable();
             $table->text('remarks')->nullable();
             $table->timestamp('approved_at')->nullable();
             $table->timestamps();
@@ -79,6 +94,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->string('label')->default('default');
+            $table->enum('signature_type', ['requester', 'approver', 'issuer', 'receiver'])->default('requester');
             $table->string('path');
             $table->boolean('is_active')->default(true);
             $table->timestamps();
@@ -103,6 +119,7 @@ return new class extends Migration
         Schema::dropIfExists('signature_images');
         Schema::dropIfExists('approvals');
         Schema::dropIfExists('ris_details');
+        Schema::dropIfExists('approval_matrix_steps');
         Schema::dropIfExists('ris_headers');
         Schema::dropIfExists('items');
         Schema::dropIfExists('categories');

@@ -17,8 +17,11 @@ class RisResource extends JsonResource
             'office' => $this->office,
             'purpose' => $this->purpose,
             'status' => $this->status,
+            'current_approval_level' => $this->current_approval_level,
+            'verification_url' => $this->verification_url,
             'division' => $this->whenLoaded('division'),
             'details' => RisDetailResource::collection($this->whenLoaded('details')),
+            'approvals' => $this->whenLoaded('approvals'),
             'created_at' => optional($this->created_at)->toIso8601String(),
         ];
     }

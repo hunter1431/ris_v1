@@ -9,7 +9,10 @@
         table { width: 100%; border-collapse: collapse; }
         th, td { border: 1px solid #111; padding: 5px; vertical-align: top; }
         .meta td { border: 0; padding: 3px; }
-        .sign td { height: 72px; text-align: center; vertical-align: bottom; }
+        .sign td { height: 82px; text-align: center; vertical-align: bottom; }
+        .signature { max-height: 38px; max-width: 130px; display: block; margin: 0 auto 4px; }
+        .qr { margin-top: 12px; text-align: right; font-size: 9px; }
+        .qr img { height: 90px; width: 90px; }
     </style>
 </head>
 <body>
@@ -36,7 +39,28 @@
         </tbody>
     </table>
     <table class="sign">
-        <tr><td>Requested by<br>{{ $ris->requestedBy?->name }}</td><td>Approved by<br>{{ $ris->approvedBy?->name }}</td><td>Issued by<br>{{ $ris->issuedBy?->name }}</td><td>Received by<br>{{ $ris->receivedBy?->name }}</td></tr>
+        <tr>
+            <td>
+                @if ($signatures['requester'] ?? null)<img class="signature" src="{{ $signatures['requester'] }}">@endif
+                Requested by<br>{{ $ris->requestedBy?->name }}
+            </td>
+            <td>
+                @if ($signatures['approver'] ?? null)<img class="signature" src="{{ $signatures['approver'] }}">@endif
+                Approved by<br>{{ $ris->approvedBy?->name }}
+            </td>
+            <td>
+                @if ($signatures['issuer'] ?? null)<img class="signature" src="{{ $signatures['issuer'] }}">@endif
+                Issued by<br>{{ $ris->issuedBy?->name }}
+            </td>
+            <td>
+                @if ($signatures['receiver'] ?? null)<img class="signature" src="{{ $signatures['receiver'] }}">@endif
+                Received by<br>{{ $ris->receivedBy?->name }}
+            </td>
+        </tr>
     </table>
+    <div class="qr">
+        <img src="{{ $qrCode }}" alt="QR verification code">
+        <div>Verify: {{ $verificationUrl }}</div>
+    </div>
 </body>
 </html>

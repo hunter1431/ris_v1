@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Approval extends Model
 {
-    protected $fillable = ['ris_id', 'user_id', 'action', 'remarks', 'approved_at'];
+    protected $fillable = ['ris_id', 'user_id', 'action', 'approval_level', 'role_name', 'remarks', 'approved_at'];
     protected $casts = ['approved_at' => 'datetime'];
 
     public function ris(): BelongsTo

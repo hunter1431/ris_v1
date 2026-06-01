@@ -8,6 +8,7 @@ use App\Events\RisCreated;
 use App\Events\RisIssued;
 use App\Models\Approval;
 use App\Models\RisHeader;
+use App\Models\User;
 use App\Notifications\RisStatusChanged;
 use App\Repositories\RisRepository;
 use Illuminate\Support\Facades\DB;
@@ -18,6 +19,8 @@ class RisWorkflowService
     public function __construct(
         private RisNumberService $numbers,
         private RisRepository $repository,
+        private ApprovalMatrixService $approvalMatrix,
+        private AuditLogService $audit,
     ) {
     }
 
@@ -32,6 +35,7 @@ class RisWorkflowService
             ]);
 
             $this->repository->createDetails($ris, $dto->details);
+            $this->audit->record('John created RIS', $ris, $userId, [], $ris->toArray());
             event(new RisCreated($ris));
 
             return $ris->load(['division', 'details.item']);
@@ -40,14 +44,21 @@ class RisWorkflowService
 
     public function submit(RisHeader $ris, int $userId): RisHeader
     {
-        return $this->transition($ris, $userId, 'submitted', 'pending');
+        return $this->transition($ris, $userId, 'submitted', 'pending', 'Submitted for approval.');
     }
 
     public function approve(RisHeader $ris, int $userId, ?string $remarks = null): RisHeader
     {
-        $ris = $this->transition($ris, $userId, 'approved', 'approved', $remarks, ['approved_by' => $userId]);
+        $user = User::findOrFail($userId);
+        $step = $this->approvalMatrix->assertUserCanApprove($ris, $user);
+        $status = $step->is_final ? 'approved' : 'pending';
+
+        $ris = $this->transition($ris, $userId, 'approved', $status, $remarks, [
+            'approved_by' => $step->is_final ? $userId : $ris->approved_by,
+            'current_approval_level' => $step->level,
+        ], $step->level, $step->role_name);
         event(new RisApproved($ris));
-        $ris->requestedBy?->notify(new RisStatusChanged($ris, 'approved'));
+        $ris->requestedBy?->notify(new RisStatusChanged($ris, $status));
         return $ris;
     }
 
@@ -73,17 +84,29 @@ class RisWorkflowService
         return $this->transition($ris, $userId, 'completed', 'completed', null, ['received_by' => $userId]);
     }
 
-    private function transition(RisHeader $ris, int $userId, string $action, string $status, ?string $remarks = null, array $extra = []): RisHeader
+    private function transition(
+        RisHeader $ris,
+        int $userId,
+        string $action,
+        string $status,
+        ?string $remarks = null,
+        array $extra = [],
+        ?int $approvalLevel = null,
+        ?string $roleName = null,
+    ): RisHeader
     {
-        return DB::transaction(function () use ($ris, $userId, $action, $status, $remarks, $extra) {
+        return DB::transaction(function () use ($ris, $userId, $action, $status, $remarks, $extra, $approvalLevel, $roleName) {
             $ris->update(['status' => $status, ...$extra]);
             Approval::create([
                 'ris_id' => $ris->id,
                 'user_id' => $userId,
                 'action' => $action,
+                'approval_level' => $approvalLevel,
+                'role_name' => $roleName,
                 'remarks' => $remarks,
                 'approved_at' => now(),
             ]);
+            $this->audit->record("{$action} RIS", $ris, $userId, $ris->getOriginal(), $ris->getChanges());
 
             return $ris->fresh(['division', 'details.item', 'approvals']);
         });

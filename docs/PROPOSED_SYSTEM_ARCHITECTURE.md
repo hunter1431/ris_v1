@@ -26,6 +26,20 @@ Database (Stored Procedures / SQL)
 - API Resource
 - Domain Event
 
+## Implemented System Modules
+
+- User Management: roles, permissions, login, token auth, users page
+- Inventory: master item search and stock balances
+- RIS: headers, dynamic details, generated RIS numbers
+- Approval Workflow: multi-level approval matrix
+- Issuance: issued quantity entry and automatic inventory deduction
+- PDF: official RIS PDF output
+- Electronic Signatures: uploaded signatures printed on PDF
+- Dashboard Analytics: cards, monthly requests, most requested items
+- Notifications: queued email/database notification skeleton
+- Audit Trail: workflow actions written to `audit_logs`
+- Reports: RIS summary and inventory Excel exports
+
 ## Layer Responsibilities
 
 ### Controller
@@ -112,3 +126,45 @@ Current examples:
 - `App\Events\RisCreated`
 - `App\Events\RisApproved`
 - `App\Events\RisIssued`
+
+## Enterprise Feature Implementations
+
+### Multi-level Approval Matrix
+
+The approval matrix is stored in `approval_matrix_steps`.
+
+Default seeded workflow:
+
+```text
+Level 1: Division Head
+Level 2: Supply Officer (final approval)
+```
+
+Runtime service:
+
+- `App\Services\ApprovalMatrixService`
+
+### QR Code Verification on RIS
+
+Each RIS receives a `qr_token`. The PDF prints a QR code linking to:
+
+```text
+/verify-ris/{token}
+```
+
+Runtime service:
+
+- `App\Services\QrVerificationService`
+
+### PDF Digital Signatures
+
+Signature images are stored in `signature_images`, grouped by type:
+
+- requester
+- approver
+- issuer
+- receiver
+
+Runtime service:
+
+- `App\Services\DigitalSignatureService`

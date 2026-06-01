@@ -22,7 +22,10 @@ class RisHeader extends Model
         'received_by',
         'status',
         'qr_token',
+        'current_approval_level',
     ];
+
+    protected $casts = ['current_approval_level' => 'integer'];
 
     public function division(): BelongsTo
     {
@@ -57,5 +60,10 @@ class RisHeader extends Model
     public function approvals(): HasMany
     {
         return $this->hasMany(Approval::class, 'ris_id');
+    }
+
+    public function getVerificationUrlAttribute(): string
+    {
+        return url("/verify-ris/{$this->qr_token}");
     }
 }

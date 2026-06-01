@@ -42,6 +42,21 @@ Current implementation examples:
 - API Resource: `App\Http\Resources\RisResource`
 - Domain Events: `App\Events\RisCreated`, `App\Events\RisApproved`, `App\Events\RisIssued`
 
+## Implemented Stack
+
+- Laravel 12 API
+- Sanctum token authentication
+- MySQL
+- Queue-ready notifications
+- PDF generation
+- Excel export
+- Vue 3
+- Pinia
+- Vue Router
+- Axios
+- TailwindCSS
+- PrimeVue
+
 ## System Modules
 
 ### 1. User Management
@@ -64,6 +79,13 @@ Permissions:
 | Issue Stocks | No | No | Yes | Yes |
 | Inventory | View | View | Manage | Manage |
 | Reports | View | View | View | Yes |
+
+Implemented files:
+
+- `App\Http\Controllers\Api\AuthController`
+- `App\Http\Controllers\Api\UserController`
+- `resources/js/pages/Login.vue`
+- `resources/js/pages/Users.vue`
 
 ### 2. Inventory Module
 
@@ -190,6 +212,12 @@ Charts:
 - Monthly Requests
 - Most Requested Items
 
+Implemented endpoint:
+
+```text
+GET /api/dashboard
+```
+
 ### 10. Notification System
 
 When RIS status changes, notifications can be sent through:
@@ -208,6 +236,11 @@ Every action should be recorded:
 - Supply Officer issued stocks
 
 The schema includes `audit_logs`.
+
+Implemented files:
+
+- `App\Models\AuditLog`
+- `App\Services\AuditLogService`
 
 ### 12. Reports Module
 
@@ -271,11 +304,11 @@ Employee
 
 ## Recommended Enterprise Features
 
-Because this is designed for a DPWH/LGU/National Agency style workflow, the scaffold reserves room for:
+Because this is designed for a DPWH/LGU/National Agency style workflow, the scaffold now includes code for:
 
-- Multi-level Approval Matrix
-- QR Code Verification on RIS
-- PDF Digital Signatures
+- Multi-level Approval Matrix through `approval_matrix_steps`, `ApprovalMatrixService`, and approval-level tracking.
+- QR Code Verification on RIS through `qr_token`, `QrVerificationService`, `/api/verify-ris/{token}`, and QR codes printed on generated PDFs.
+- PDF Digital Signatures through `signature_images`, `DigitalSignatureService`, `/api/signatures`, and signature slots on the RIS PDF.
 
 ## API Routes
 
@@ -287,6 +320,15 @@ POST /api/ris/{ris}/submit
 POST /api/ris/{ris}/approve
 POST /api/ris/{ris}/issue
 GET  /api/ris/{ris}/pdf
+GET  /api/verify-ris/{token}
+POST /api/login
+GET  /api/me
+POST /api/logout
+GET  /api/dashboard
+GET  /api/users
+POST /api/users
+GET  /api/signatures
+POST /api/signatures
 GET  /api/reports/ris-summary
 GET  /api/reports/inventory
 ```
