@@ -5,11 +5,19 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\RisDetail;
 use App\Models\RisHeader;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
     public function __invoke(): array
     {
+        $driver = DB::getDriverName();
+        $monthFormat = match ($driver) {
+            'sqlite' => "strftime('%Y-%m', created_at)",
+            'pgsql' => "to_char(created_at, 'YYYY-MM')",
+            default => "DATE_FORMAT(created_at, '%Y-%m')",
+        };
+
         return [
             'cards' => [
                 'total_ris' => RisHeader::count(),
@@ -18,7 +26,7 @@ class DashboardController extends Controller
                 'issued_ris' => RisHeader::where('status', 'issued')->count(),
             ],
             'monthly_requests' => RisHeader::query()
-                ->selectRaw("DATE_FORMAT(created_at, '%Y-%m') as month, COUNT(*) as total")
+                ->selectRaw("{$monthFormat} as month, COUNT(*) as total")
                 ->groupBy('month')
                 ->orderBy('month')
                 ->get(),

@@ -10,6 +10,7 @@ import VerifyRis from '../pages/VerifyRis.vue';
 import Login from '../pages/Login.vue';
 import Users from '../pages/Users.vue';
 import Placeholder from '../pages/Placeholder.vue';
+import { useAuthStore } from '../stores/auth';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -27,14 +28,28 @@ const router = createRouter({
   ],
 });
 
-router.beforeEach((to) => {
+router.beforeEach(async (to) => {
+  const auth = useAuthStore();
   const token = localStorage.getItem('ris_token');
 
-  if (to.meta.requiresAuth && !token) {
+  if (to.meta.requiresAuth && token && !auth.user) {
+    auth.token = token;
+
+    try {
+      await auth.loadMe();
+    } catch (exception) {
+      auth.user = null;
+      auth.token = null;
+      localStorage.removeItem('ris_token');
+      return { path: '/login', query: { redirect: to.fullPath } };
+    }
+  }
+
+  if (to.meta.requiresAuth && !auth.token) {
     return { path: '/login', query: { redirect: to.fullPath } };
   }
 
-  if (to.meta.guest && token) {
+  if (to.meta.guest && auth.token) {
     return { path: '/' };
   }
 });

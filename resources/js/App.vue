@@ -1,8 +1,8 @@
 <template>
   <RouterView v-if="$route.path === '/login'" />
-  <main v-else class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+  <main v-else class="app-shell">
     <!-- Mobile Hamburger Menu Button -->
-    <div class="fixed top-0 left-0 right-0 z-40 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between lg:hidden shadow-sm">
+    <div class="fixed top-0 left-0 right-0 z-40 bg-white/95 border-b border-slate-200 px-4 py-3 flex items-center justify-between lg:hidden shadow-sm backdrop-blur-sm">
       <div class="text-xl font-bold text-blue-600">RIS V1</div>
       <button @click="mobileMenuOpen = !mobileMenuOpen" class="text-gray-600 hover:text-gray-900">
         <i :class="mobileMenuOpen ? 'pi pi-times' : 'pi pi-bars'" style="font-size: 1.5rem"></i>
@@ -10,9 +10,9 @@
     </div>
 
     <!-- Sidebar Navigation -->
-    <aside :class="['fixed inset-y-0 left-0 z-30 w-64 bg-white border-r border-gray-200 p-6 overflow-y-auto transition-all duration-300 shadow-lg lg:shadow-none',
+    <aside :class="['fixed inset-y-0 left-0 z-30 w-64 bg-white/95 border-r border-slate-200 p-6 overflow-y-auto transition-all duration-300 shadow-lg lg:shadow-none',
       mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-    ]" style="margin-top: 0">
+    ]">
       <div v-if="!isLargeScreen" class="text-2xl font-bold text-blue-600 mb-8">RIS V1</div>
       <div v-else class="text-2xl font-bold text-blue-600 mb-8">RIS V1</div>
       <nav class="space-y-2">
@@ -29,7 +29,7 @@
     <!-- Main Content -->
     <section class="lg:ml-64 pt-16 lg:pt-0">
       <!-- Header -->
-      <header class="bg-white border-b border-gray-200 px-6 py-4 shadow-sm sticky top-0 z-10 lg:relative">
+      <header class="app-header sticky top-0 z-10 lg:relative">
         <div class="flex items-center justify-between">
           <h1 class="text-xl font-bold text-gray-900 hidden sm:block">Government RIS System</h1>
           <h1 class="text-lg font-bold text-gray-900 sm:hidden">RIS System</h1>

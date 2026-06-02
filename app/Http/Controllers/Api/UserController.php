@@ -10,8 +10,12 @@ use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
-    public function index(): array
+    public function index(Request $request): array
     {
+        if (! $request->user()->can('manage users')) {
+            abort(403);
+        }
+
         return [
             'users' => User::with('roles')->orderBy('name')->get(),
             'roles' => Role::orderBy('name')->get(),
@@ -20,6 +24,9 @@ class UserController extends Controller
 
     public function store(Request $request): User
     {
+        if (! $request->user()->can('manage users')) {
+            abort(403);
+        }
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'unique:users,email'],

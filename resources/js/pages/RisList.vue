@@ -63,9 +63,9 @@
               <!-- Actions -->
               <td class="px-4 py-4">
                 <div class="flex gap-2 justify-center flex-wrap">
-                  <a :href="`/api/ris/${ris.id}/pdf`" target="_blank" class="btn p-2" title="Download PDF">
+                  <button type="button" @click="downloadRisPdf(ris.id)" class="btn p-2" title="Download PDF">
                     <i class="pi pi-download"></i>
-                  </a>
+                  </button>
                   <a :href="ris.verification_url" target="_blank" class="btn p-2" title="Verify QR">
                     <i class="pi pi-qrcode"></i>
                   </a>
@@ -93,6 +93,7 @@
 <script setup>
 import { onMounted } from 'vue';
 import { useRisStore } from '../stores/ris';
+import { api } from '../stores/api';
 
 const store = useRisStore();
 
@@ -123,4 +124,18 @@ function getStatusBadgeClass(status) {
 }
 
 onMounted(() => store.loadRis());
+
+async function downloadRisPdf(risId) {
+  const response = await api.get(`/ris/${risId}/pdf`, { responseType: 'blob' });
+  const blob = new Blob([response.data], { type: response.headers['content-type'] });
+  const objectUrl = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+
+  link.href = objectUrl;
+  link.download = `ris-${risId}.pdf`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(objectUrl);
+}
 </script>

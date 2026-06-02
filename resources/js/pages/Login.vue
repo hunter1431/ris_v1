@@ -84,10 +84,11 @@
 
 <script setup>
 import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
 
 const auth = useAuthStore();
+const route = useRoute();
 const router = useRouter();
 const email = ref('admin@example.com');
 const password = ref('password');
@@ -100,7 +101,8 @@ async function submit() {
 
   try {
     await auth.login({ email: email.value, password: password.value });
-    router.push('/');
+    const redirect = String(route.query.redirect || '/');
+    router.push(redirect);
   } catch (exception) {
     error.value = exception.response?.data?.message
       || exception.response?.data?.errors?.email?.[0]

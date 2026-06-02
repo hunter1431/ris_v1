@@ -35,7 +35,8 @@ class RisWorkflowService
             ]);
 
             $this->repository->createDetails($ris, $dto->details);
-            $this->audit->record('John created RIS', $ris, $userId, [], $ris->toArray());
+            $userName = User::find($userId)?->name ?? 'System';
+            $this->audit->record("{$userName} created RIS", $ris, $userId, [], $ris->toArray());
             event(new RisCreated($ris));
 
             return $ris->load(['division', 'details.item']);
