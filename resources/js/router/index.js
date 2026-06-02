@@ -11,18 +11,32 @@ import Login from '../pages/Login.vue';
 import Users from '../pages/Users.vue';
 import Placeholder from '../pages/Placeholder.vue';
 
-export default createRouter({
+const router = createRouter({
   history: createWebHistory(),
   routes: [
-    { path: '/login', component: Login },
-    { path: '/', component: Dashboard },
-    { path: '/ris/create', component: RisCreate },
-    { path: '/ris', component: RisList },
-    { path: '/approval', component: Approval },
-    { path: '/inventory', component: Inventory },
-    { path: '/reports', component: Reports },
-    { path: '/users', component: Users },
-    { path: '/settings', component: Settings },
-    { path: '/verify-ris/:token', component: VerifyRis },
+    { path: '/login', component: Login, meta: { guest: true } },
+    { path: '/', component: Dashboard, meta: { requiresAuth: true } },
+    { path: '/ris/create', component: RisCreate, meta: { requiresAuth: true } },
+    { path: '/ris', component: RisList, meta: { requiresAuth: true } },
+    { path: '/approval', component: Approval, meta: { requiresAuth: true } },
+    { path: '/inventory', component: Inventory, meta: { requiresAuth: true } },
+    { path: '/reports', component: Reports, meta: { requiresAuth: true } },
+    { path: '/users', component: Users, meta: { requiresAuth: true } },
+    { path: '/settings', component: Settings, meta: { requiresAuth: true } },
+    { path: '/verify-ris/:token', component: VerifyRis, meta: { public: true } },
   ],
 });
+
+router.beforeEach((to) => {
+  const token = localStorage.getItem('ris_token');
+
+  if (to.meta.requiresAuth && !token) {
+    return { path: '/login', query: { redirect: to.fullPath } };
+  }
+
+  if (to.meta.guest && token) {
+    return { path: '/' };
+  }
+});
+
+export default router;
