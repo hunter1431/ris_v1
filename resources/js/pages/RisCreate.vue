@@ -1,24 +1,126 @@
 <template>
-  <section class="p-6">
-    <form class="panel mx-auto max-w-5xl space-y-5" @submit.prevent="submit">
-      <h2 class="panel-title">Create RIS</h2>
-      <div class="grid gap-4 md:grid-cols-3">
-        <input v-model="form.entity_name" class="field" placeholder="Entity Name" />
-        <input v-model="form.fund_cluster" class="field" placeholder="Fund Cluster" />
-        <input v-model="form.office" class="field" placeholder="Office" />
-        <input v-model="form.responsibility_center_code" class="field" placeholder="Responsibility Center Code" />
-        <input v-model="form.purpose" class="field md:col-span-2" placeholder="Purpose" />
-      </div>
-      <div class="space-y-3">
-        <div v-for="(row, index) in form.details" :key="index" class="grid gap-3 md:grid-cols-[1fr_120px_120px]">
-          <input v-model="row.search" class="field" placeholder="Search item, e.g. Bond Paper" @change="search(row.search)" />
-          <input v-model.number="row.qty_requested" class="field" type="number" min="1" placeholder="Qty" />
-          <button class="btn" type="button" @click="pickFirst(row)">Auto Fill</button>
+  <section class="space-y-6">
+    <!-- Page Header -->
+    <div>
+      <h2 class="text-2xl font-bold text-gray-900">Create Requisition</h2>
+      <p class="text-gray-600 mt-1">Submit a new RIS request for your department.</p>
+    </div>
+
+    <!-- Form -->
+    <form @submit.prevent="submit" class="panel max-w-6xl space-y-6">
+      <!-- Header Information Section -->
+      <div>
+        <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+          <i class="pi pi-info-circle text-blue-600"></i>
+          Request Information
+        </h3>
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Entity Name</label>
+            <input v-model="form.entity_name" type="text" class="field w-full" placeholder="Department/Entity" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Fund Cluster</label>
+            <input v-model="form.fund_cluster" type="text" class="field w-full" placeholder="Fund Cluster Code" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Office</label>
+            <input v-model="form.office" type="text" class="field w-full" placeholder="Office Name" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Responsibility Center</label>
+            <input v-model="form.responsibility_center_code" type="text" class="field w-full" placeholder="RCC Code" />
+          </div>
+          <div class="sm:col-span-2 lg:col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Purpose</label>
+            <input v-model="form.purpose" type="text" class="field w-full" placeholder="Purpose of request" />
+          </div>
         </div>
       </div>
-      <div class="flex gap-3">
-        <button class="btn" type="button" @click="addRow">+ Add Item</button>
-        <button class="btn-primary">Submit RIS</button>
+
+      <!-- Items Section -->
+      <div class="border-t border-gray-200 pt-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+          <i class="pi pi-shopping-cart text-green-600"></i>
+          Items Required
+        </h3>
+        
+        <!-- Item Rows -->
+        <div class="space-y-3">
+          <div v-for="(row, index) in form.details" :key="index" class="panel p-4 bg-gray-50 border border-gray-200">
+            <div class="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1fr_150px_120px_60px]">
+              <!-- Item Search -->
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Search Item</label>
+                <input 
+                  v-model="row.search" 
+                  type="text"
+                  class="field w-full"
+                  placeholder="e.g. Bond Paper, Ballpen" 
+                  @change="search(row.search)"
+                />
+              </div>
+              
+              <!-- Quantity -->
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Quantity</label>
+                <input 
+                  v-model.number="row.qty_requested" 
+                  type="number" 
+                  min="1" 
+                  class="field w-full"
+                  placeholder="Qty"
+                />
+              </div>
+              
+              <!-- Auto Fill Button -->
+              <div class="flex items-end">
+                <button 
+                  type="button" 
+                  @click="pickFirst(row)"
+                  class="btn w-full gap-1 text-xs"
+                >
+                  <i class="pi pi-check"></i>
+                  <span class="hidden sm:inline">Auto Fill</span>
+                </button>
+              </div>
+              
+              <!-- Remove Button -->
+              <div class="flex items-end">
+                <button 
+                  v-if="form.details.length > 1"
+                  type="button" 
+                  @click="form.details.splice(index, 1)"
+                  class="btn w-full gap-1 text-xs text-red-600 hover:bg-red-50"
+                >
+                  <i class="pi pi-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Add Item Button -->
+        <button 
+          type="button" 
+          @click="addRow"
+          class="btn mt-4 gap-2"
+        >
+          <i class="pi pi-plus"></i>
+          Add Another Item
+        </button>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="border-t border-gray-200 pt-6 flex gap-3 sm:flex-row flex-col">
+        <RouterLink to="/ris" class="btn gap-2">
+          <i class="pi pi-arrow-left"></i>
+          <span>Back to List</span>
+        </RouterLink>
+        <button type="submit" class="btn-primary gap-2 flex-1 sm:flex-none">
+          <i class="pi pi-send"></i>
+          <span>Submit RIS Request</span>
+        </button>
       </div>
     </form>
   </section>
