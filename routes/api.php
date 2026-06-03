@@ -20,6 +20,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/users', [UserController::class, 'index']);
     Route::post('/users', [UserController::class, 'store']);
     Route::get('/inventory', [InventoryController::class, 'index']);
+    Route::get('/inventory/{item}', [InventoryController::class, 'show']);
+    Route::post('/inventory', [InventoryController::class, 'store']);
+    Route::put('/inventory/{item}', [InventoryController::class, 'update']);
+    Route::delete('/inventory/{item}', [InventoryController::class, 'destroy']);
     Route::get('/ris', [RisController::class, 'index']);
     Route::post('/ris', [RisController::class, 'store']);
     Route::post('/ris/{ris}/submit', [RisController::class, 'submit']);

@@ -1,6 +1,7 @@
 <template>
   <RouterView v-if="$route.path === '/login'" />
   <main v-else class="app-shell">
+    <Toast position="top-right" />
     <!-- Mobile Hamburger Menu Button -->
     <div class="fixed top-0 left-0 right-0 z-40 bg-white/95 border-b border-slate-200 px-4 py-3 flex items-center justify-between lg:hidden shadow-sm backdrop-blur-sm">
       <div class="text-xl font-bold text-blue-600">RIS V1</div>
@@ -58,6 +59,7 @@
 import { ref, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from './stores/auth';
+import Toast from 'primevue/toast';
 
 const router = useRouter();
 const auth = useAuthStore();

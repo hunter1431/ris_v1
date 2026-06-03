@@ -24,17 +24,28 @@
 
 <script setup>
 import { ref } from 'vue';
+import { useToast } from 'primevue/usetoast';
 import { api } from '../stores/api';
 
+const toast = useToast();
 const signatureType = ref('requester');
 const file = ref(null);
 
 async function upload() {
-  if (!file.value) return;
+  if (!file.value) {
+    toast.add({ severity: 'warn', summary: 'No File', detail: 'Please select a signature file before uploading.' });
+    return;
+  }
 
-  const form = new FormData();
-  form.append('signature_type', signatureType.value);
-  form.append('signature', file.value);
-  await api.post('/signatures', form, { headers: { 'Content-Type': 'multipart/form-data' } });
+  try {
+    const formData = new FormData();
+    formData.append('signature_type', signatureType.value);
+    formData.append('signature', file.value);
+    await api.post('/signatures', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+    toast.add({ severity: 'success', summary: 'Uploaded', detail: 'Signature uploaded successfully.' });
+    file.value = null;
+  } catch (exception) {
+    toast.add({ severity: 'error', summary: 'Error', detail: exception.response?.data?.message || 'Unable to upload signature.' });
+  }
 }
 </script>

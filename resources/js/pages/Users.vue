@@ -24,8 +24,10 @@
 
 <script setup>
 import { onMounted, reactive, ref } from 'vue';
+import { useToast } from 'primevue/usetoast';
 import { api } from '../stores/api';
 
+const toast = useToast();
 const users = ref([]);
 const roles = ref([]);
 const form = reactive({ name: '', email: '', password: '', role: 'Employee/Requester' });
@@ -38,11 +40,16 @@ async function load() {
 }
 
 async function createUser() {
-  await api.post('/users', form);
-  form.name = '';
-  form.email = '';
-  form.password = '';
-  await load();
+  try {
+    await api.post('/users', form);
+    toast.add({ severity: 'success', summary: 'Created', detail: 'User created successfully.' });
+    form.name = '';
+    form.email = '';
+    form.password = '';
+    await load();
+  } catch (exception) {
+    toast.add({ severity: 'error', summary: 'Error', detail: exception.response?.data?.message || 'Unable to create user.' });
+  }
 }
 
 onMounted(load);

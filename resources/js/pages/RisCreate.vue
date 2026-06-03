@@ -128,9 +128,13 @@
 
 <script setup>
 import { reactive } from 'vue';
+import { useRouter } from 'vue-router';
+import { useToast } from 'primevue/usetoast';
 import { useRisStore } from '../stores/ris';
 
 const store = useRisStore();
+const router = useRouter();
+const toast = useToast();
 const form = reactive({
   entity_name: 'DPWH / LGU Office',
   fund_cluster: '',
@@ -157,6 +161,12 @@ function pickFirst(row) {
 }
 
 async function submit() {
-  await store.createRis({ ...form, details: form.details.map(({ item_id, qty_requested }) => ({ item_id, qty_requested })) });
+  try {
+    await store.createRis({ ...form, details: form.details.map(({ item_id, qty_requested }) => ({ item_id, qty_requested })) });
+    toast.add({ severity: 'success', summary: 'Created', detail: 'RIS request created successfully.' });
+    router.push('/ris');
+  } catch (exception) {
+    toast.add({ severity: 'error', summary: 'Error', detail: exception.response?.data?.message || 'Unable to submit RIS request.' });
+  }
 }
 </script>

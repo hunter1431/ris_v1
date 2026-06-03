@@ -37,13 +37,20 @@
 </template>
 
 <script setup>
+import { useToast } from 'primevue/usetoast';
 import { useRisStore } from '../stores/ris';
 import { api } from '../stores/api';
 
 const store = useRisStore();
+const toast = useToast();
 
 async function approve(id) {
-  await api.post(`/ris/${id}/approve`);
-  await store.loadRis({ status: 'pending' });
+  try {
+    await api.post(`/ris/${id}/approve`);
+    toast.add({ severity: 'success', summary: 'Approved', detail: 'RIS next approval step completed.' });
+    await store.loadRis({ status: 'pending' });
+  } catch (exception) {
+    toast.add({ severity: 'error', summary: 'Error', detail: exception.response?.data?.message || 'Unable to approve RIS.' });
+  }
 }
 </script>
