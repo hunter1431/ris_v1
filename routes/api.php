@@ -22,6 +22,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/inventory', [InventoryController::class, 'index']);
     Route::get('/ris', [RisController::class, 'index']);
     Route::post('/ris', [RisController::class, 'store']);
+    Route::put('/ris/{ris}', [RisController::class, 'update']);
     Route::post('/ris/{ris}/submit', [RisController::class, 'submit']);
     Route::post('/ris/{ris}/approve', [RisController::class, 'approve']);
     Route::post('/ris/{ris}/issue', [RisController::class, 'issue']);

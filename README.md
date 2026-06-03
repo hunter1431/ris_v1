@@ -1,8 +1,291 @@
 # RIS V1 Enterprise System
 
-Laravel 12 API and Vue 3 frontend for a government-style Requisition and Issue Slip workflow.
+A Laravel 12 API and Vue 3 frontend application for a government-style Requisition and Issue Slip (RIS) workflow.
 
-## Proposed System Architecture
+## 1. Introduction
+
+The Requisition and Issue Slip Management System automates and modernizes the manual RIS process used by government agencies, including DPWH, LGUs, national government agencies, state universities, and government-owned and controlled corporations.
+
+The current manual process requires employees to:
+
+- Fill out paper forms manually
+- Write stock numbers manually
+- Search inventory records manually
+- Route documents physically for approval
+- Monitor approvals through follow-ups
+- Compute inventory balances manually
+- Generate reports manually
+- Store physical copies of RIS documents
+
+This system digitizes the entire workflow and replaces manual effort with a centralized, audit-ready platform.
+
+## 2. Project Objectives
+
+The system is designed to:
+
+- Reduce processing time
+- Improve accuracy
+- Increase transparency
+- Ensure accountability
+- Generate reports instantly
+- Maintain compliance with government-prescribed formats
+
+## 3. System Users
+
+### Employee / Requester
+
+Responsible for requesting supplies.
+
+Capabilities:
+
+- Create RIS
+- Search available inventory
+- View request status
+- Print approved RIS
+- Receive notifications
+
+### Division Head
+
+Responsible for approving requests.
+
+Capabilities:
+
+- Review RIS requests
+- Approve or reject requests
+- Add remarks
+- Monitor division requests
+
+### Supply Officer
+
+Responsible for inventory management and issuance.
+
+Capabilities:
+
+- Manage inventory
+- Process approved RIS
+- Issue requested items
+- Update stock balances
+- Generate reports
+
+### Administrator
+
+Responsible for system management.
+
+Capabilities:
+
+- User management
+- Role management
+- Approval configuration
+- Audit monitoring
+- System settings
+- Database backup
+
+### Auditor
+
+Responsible for compliance checking.
+
+Capabilities:
+
+- View transactions
+- Generate audit reports
+- Verify approvals
+- Track inventory movement
+
+## 4. Major System Modules
+
+### Dashboard
+
+Purpose:
+
+Provides a summary of system activity.
+
+Features:
+
+- Total RIS created
+- Pending requests
+- Approved requests
+- Issued requests
+- Cancelled requests
+- Inventory summary
+- Charts for monthly trends and most requested items
+
+### RIS Management
+
+Purpose:
+
+Automates RIS creation and processing.
+
+Features:
+
+- Create RIS using inventory search
+- Auto-fill stock number, unit, description, and available quantity
+- Dynamic item rows
+- Draft saving for unfinished requests
+- Request status tracking
+
+### Approval Workflow
+
+Purpose:
+
+Automates routing of RIS documents.
+
+Traditional Process:
+
+Employee → Division Head → Supply Officer
+
+System Process:
+
+Submit → Approval → Issuance
+
+Features:
+
+- One-click approval
+- Approval history tracking
+- Role-based routing
+
+### Inventory Management
+
+Purpose:
+
+Maintains stock records.
+
+Features:
+
+- Centralized item master list
+- Real-time inventory updates
+- Low stock monitoring
+
+### Issuance Management
+
+Purpose:
+
+Manages release of supplies.
+
+Features:
+
+- Partial issuance
+- Issuance records with issued by / received by and quantities
+- Automatic stock deduction
+
+### Notifications
+
+Purpose:
+
+Automatically informs users.
+
+Features:
+
+- RIS submitted notifications
+- RIS approved notifications
+- RIS issued notifications
+
+### PDF Generation
+
+Purpose:
+
+Generates official RIS forms.
+
+Features:
+
+- Government-approved RIS format
+- Digital signature support
+- Print-ready output
+
+### Reporting Module
+
+Purpose:
+
+Generates management reports.
+
+Reports:
+
+- RIS report
+- Inventory report
+- Department usage report
+
+### Audit Trail
+
+Purpose:
+
+Records all system activities.
+
+Features:
+
+- Action logging for RIS creation, approval, issuance
+- Audit-ready records for compliance
+- Transparent accountability
+
+### User Management
+
+Purpose:
+
+Controls system access.
+
+Features:
+
+- Role-based access control
+- Permission management
+- Secure user administration
+
+## 5. Advanced Features
+
+- QR Code verification for RIS authenticity
+- Electronic signatures for requester, approver, and issuer
+- Email notifications for workflow events
+- Excel export for reports
+- Backup and restore support
+
+## 6. Benefits to Employees
+
+Before:
+
+- Write RIS manually
+- Search inventory manually
+- Walk documents for approval
+- Wait for signatures
+- Track status manually
+
+After:
+
+- Create RIS online
+- Search inventory instantly
+- Submit electronically
+- Receive automatic updates
+- Print completed RIS
+
+## 7. Benefits to Supply Office
+
+- Centralized inventory management
+- Automatic stock deduction
+- Reduced encoding errors
+- Faster issuance processing
+- Instant report generation
+- Better inventory forecasting
+
+## 8. Benefits to Management
+
+- Real-time monitoring
+- Accurate reporting
+- Audit-ready records
+- Transparency and accountability
+- Improved decision-making
+
+## 9. Future Expansion Modules
+
+The system can later integrate with:
+
+- Purchase Request (PR) System
+- Purchase Order (PO) System
+- Annual Procurement Plan (APP)
+- Stock Card Management
+- Property Management System
+- Asset Tracking
+- Warehouse Management
+- Budget Monitoring
+- COA Compliance Reporting
+- Mobile Application
+
+## 10. System Architecture
 
 ```text
 Controller
@@ -20,297 +303,26 @@ Repository
 MySQLService (Data Access Layer)
   |
   v
-Database (Stored Procedures / SQL)
+Database
 ```
 
-Also included:
-
-- DTO
-- FormRequest
-- API Resource
-- Domain Event
-
-Current implementation examples:
-
-- Controller: `App\Http\Controllers\Api\RisController`
-- Action: `App\Actions\Ris\CreateRisAction`
-- Service: `App\Services\RisWorkflowService`
-- Repository: `App\Repositories\RisRepository`
-- MySQLService: `App\Services\MySQLService`
-- DTO: `App\DTOs\RisData`
-- FormRequest: `App\Http\Requests\StoreRisRequest`
-- API Resource: `App\Http\Resources\RisResource`
-- Domain Events: `App\Events\RisCreated`, `App\Events\RisApproved`, `App\Events\RisIssued`
-
-## Implemented Stack
+## 11. Implemented Stack
 
 - Laravel 12 API
 - Sanctum token authentication
 - MySQL
-- Queue-ready notifications
-- PDF generation
-- Excel export
 - Vue 3
 - Pinia
 - Vue Router
 - Axios
 - TailwindCSS
 - PrimeVue
-
-## System Modules
-
-### 1. User Management
-
-Roles:
-
-- Super Admin
-- Supply Officer
-- Department Head
-- Division Head
-- Employee/Requester
-- Auditor
-
-Permissions:
-
-| Module | Employee | Division Head | Supply | Admin |
-| --- | --- | --- | --- | --- |
-| Create RIS | Yes | Yes | Yes | Yes |
-| Approve RIS | No | Yes | Yes | Yes |
-| Issue Stocks | No | No | Yes | Yes |
-| Inventory | View | View | Manage | Manage |
-| Reports | View | View | View | Yes |
-
-Implemented files:
-
-- `App\Http\Controllers\Api\AuthController`
-- `App\Http\Controllers\Api\UserController`
-- `resources/js/pages/Login.vue`
-- `resources/js/pages/Users.vue`
-
-### 2. Inventory Module
-
-Users search master inventory instead of manually typing item descriptions.
-
-`items` table:
-
-- `id`
-- `stock_no`
-- `item_code`
-- `description`
-- `unit`
-- `category_id`
-- `quantity_on_hand`
-- `reorder_level`
-- `status`
-
-Examples:
-
-| Stock No | Description | Qty |
-| --- | --- | --- |
-| PAP001 | Bond Paper A4 | 500 |
-| PEN001 | Ballpen Black | 200 |
-| INK001 | Epson Ink | 50 |
-
-RIS item search auto-fills stock number, unit, description, and available quantity.
-
-### 3. RIS Module
-
-Header:
-
-- Entity Name
-- Fund Cluster
-- Division
-- Office
-- Responsibility Center Code
-- Purpose
-
-Details:
-
-- Stock No
-- Unit
-- Description
-- Quantity Requested
-
-The frontend includes dynamic item rows with an `+ Add Item` workflow.
-
-### 4. Approval Workflow
-
-Manual process:
-
-```text
-Requester -> Division Head -> Supply Office -> Issued
-```
-
-Automated statuses:
-
-```text
-draft -> pending -> approved -> issued -> completed
-```
-
-Supported statuses:
-
-- `draft`
-- `pending`
-- `approved`
-- `issued`
-- `completed`
-- `cancelled`
-
-### 5. RIS Number Generator
-
-Automatic numbering format:
-
-```text
-2026-06-00001
-2026-06-00002
-2026-06-00003
-```
-
-Implemented in `App\Services\RisNumberService`.
-
-### 6. Issuance Module
-
-Supply Officer sees approved/pending RIS records, enters issued quantities and remarks, and inventory is automatically deducted:
-
-```php
-$item->quantity_on_hand -= $issuedQty;
-```
-
-The scaffold implements this through `RisWorkflowService::issue()`.
-
-### 7. PDF Generation
-
-Users can click `Print RIS`. Laravel generates the official RIS PDF view:
-
-```php
-$pdf = Pdf::loadView('pdf.ris', ['ris' => $ris]);
-return $pdf->download("{$ris->ris_no}.pdf");
-```
-
-### 8. Electronic Signatures
-
-The database includes `signature_images` for:
-
-- Requester Signature
-- Approver Signature
-- Issued By Signature
-- Received By Signature
-
-The PDF template is ready for signature image insertion.
-
-### 9. Dashboard Analytics
-
-Cards:
-
-- Total RIS
-- Pending RIS
-- Approved RIS
-- Issued RIS
-
-Charts:
-
-- Monthly Requests
-- Most Requested Items
-
-Implemented endpoint:
-
-```text
-GET /api/dashboard
-```
-
-### 10. Notification System
-
-When RIS status changes, notifications can be sent through:
-
-- Email
-- In-App Database Notifications
-
-Implemented skeleton: `App\Notifications\RisStatusChanged`.
-
-### 11. Audit Trail
-
-Every action should be recorded:
-
-- John created RIS
-- Maria approved RIS
-- Supply Officer issued stocks
-
-The schema includes `audit_logs`.
-
-Implemented files:
-
-- `App\Models\AuditLog`
-- `App\Services\AuditLogService`
-
-### 12. Reports Module
-
-Exports included:
-
-- RIS Summary
-- Inventory Report
-
-Recommended reports:
-
-- Monthly RIS Report
-- Inventory Report
-- Issuance Report
-
-### 13. Excel Export
-
-Export endpoints:
-
-```text
-GET /api/reports/ris-summary
-GET /api/reports/inventory
-```
-
-## Database Structure
-
-Core tables:
-
-- `ris_headers`
-- `ris_details`
-- `items`
-- `divisions`
-- `approvals`
-- `audit_logs`
-- `signature_images`
-
-## Vue Frontend Pages
-
-- Login
-- Dashboard
-- Create RIS
-- RIS List
-- RIS Approval
-- Inventory
-- Reports
-- Users
-- Settings
-
-## Professional Workflow
-
-```text
-Employee
-  -> Create RIS
-  -> Submit
-  -> Division Head Approves
-  -> Supply Officer Checks Stock
-  -> Issue Items
-  -> Inventory Updated
-  -> PDF Generated
-  -> Archived
-```
-
-## Recommended Enterprise Features
-
-Because this is designed for a DPWH/LGU/National Agency style workflow, the scaffold now includes code for:
-
-- Multi-level Approval Matrix through `approval_matrix_steps`, `ApprovalMatrixService`, and approval-level tracking.
-- QR Code Verification on RIS through `qr_token`, `QrVerificationService`, `/api/verify-ris/{token}`, and QR codes printed on generated PDFs.
-- PDF Digital Signatures through `signature_images`, `DigitalSignatureService`, `/api/signatures`, and signature slots on the RIS PDF.
-
-## API Routes
+- PDF generation
+- Excel export
+- Audit trail
+- QR verification
+
+## 12. API Routes
 
 ```text
 GET  /api/inventory
@@ -333,7 +345,31 @@ GET  /api/reports/ris-summary
 GET  /api/reports/inventory
 ```
 
-## Local Development
+## 13. Database Structure
+
+Core tables:
+
+- `ris_headers`
+- `ris_details`
+- `items`
+- `divisions`
+- `approvals`
+- `audit_logs`
+- `signature_images`
+
+## 14. Vue Frontend Pages
+
+- Login
+- Dashboard
+- Create RIS
+- RIS List
+- RIS Approval
+- Inventory
+- Reports
+- Users
+- Settings
+
+## 15. Local Development
 
 ```bash
 composer install

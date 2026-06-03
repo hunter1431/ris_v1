@@ -16,6 +16,7 @@ use App\Services\DigitalSignatureService;
 use App\Services\QrVerificationService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class RisController extends Controller
 {
@@ -49,6 +50,38 @@ class RisController extends Controller
         ]);
 
         return new RisResource($action->execute($ris, $request->user()->id, $data['details']));
+    }
+
+    public function update(RisHeader $ris, StoreRisRequest $request, RisRepository $repository)
+    {
+        $user = $request->user();
+
+        // requesters may update their own RIS only when it's still a draft
+        if ($user->id !== $ris->requested_by && ! $user->can('manage users')) {
+            abort(403);
+        }
+
+        if ($ris->status !== 'draft' && ! $user->can('manage users')) {
+            abort(403, 'Only draft RIS can be updated.');
+        }
+
+        $data = $request->validated();
+
+        return DB::transaction(function () use ($ris, $data, $repository) {
+            $headerData = [
+                'entity_name' => $data['entity_name'],
+                'fund_cluster' => $data['fund_cluster'] ?? null,
+                'division_id' => $data['division_id'],
+                'office' => $data['office'],
+                'responsibility_center_code' => $data['responsibility_center_code'] ?? null,
+                'purpose' => $data['purpose'],
+            ];
+
+            $repository->updateHeader($ris, $headerData);
+            $repository->replaceDetails($ris, $data['details']);
+
+            return new RisResource($ris->fresh(['division', 'details.item']));
+        });
     }
 
     public function pdf(RisHeader $ris, QrVerificationService $qr, DigitalSignatureService $signatures)

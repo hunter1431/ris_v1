@@ -39,4 +39,18 @@ class RisRepository
 
         return $ris->details()->get();
     }
+
+    public function updateHeader(RisHeader $ris, array $data): RisHeader
+    {
+        $ris->update($data);
+
+        return $ris->fresh();
+    }
+
+    public function replaceDetails(RisHeader $ris, array $details)
+    {
+        $ris->details()->delete();
+
+        return $this->createDetails($ris, $details);
+    }
 }
